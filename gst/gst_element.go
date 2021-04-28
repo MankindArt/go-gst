@@ -336,6 +336,17 @@ func (e *Element) GetState() State {
 	return State(e.Instance().current_state)
 }
 
+// GetRequestPad retrieves a request pad from element by name.
+func (e *Element) GetRequestPad(name string) *Pad {
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	pad := C.gst_element_get_request_pad(e.Instance(), (*C.gchar)(unsafe.Pointer(cname)))
+	if pad == nil {
+		return nil
+	}
+	return FromGstPadUnsafeFull(unsafe.Pointer(pad))
+}
+
 // GetStaticPad retrieves a pad from element by name. This version only retrieves
 // already-existing (i.e. 'static') pads.
 func (e *Element) GetStaticPad(name string) *Pad {
